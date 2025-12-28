@@ -1,0 +1,112 @@
+import collections
+
+# ---------- Задание №1 (ОПТИМИЗИРОВАННОЕ) ----------
+# Факториал и список факториалов без лишних вычислений
+
+def factorial(n):
+    r = 1
+    for i in range(1, n + 1):
+        r *= i
+    return r
+
+n = int(input())
+k = factorial(n)  # n!
+
+fact_list = []
+current = factorial(k)  # k!
+fact_list.append(current)
+
+for x in range(k, 1, -1):
+    current //= x        # (x!) / x = (x-1)!
+    fact_list.append(current)
+
+print(fact_list)
+
+
+# ---------- Задание №2 ----------
+# CRUD для базы данных ветеринарной клиники
+
+pets = {
+    1: {
+        "Мухтар": {
+            "Вид питомца": "Собака",
+            "Возраст питомца": 9,
+            "Имя владельца": "Павел"
+        }
+    }
+}
+
+def get_pet(ID):
+    return pets[ID] if ID in pets else False
+
+def get_suffix(age):
+    if age % 10 == 1 and age % 100 != 11:
+        return "год"
+    elif 2 <= age % 10 <= 4 and not (12 <= age % 100 <= 14):
+        return "года"
+    else:
+        return "лет"
+
+def pets_list():
+    for pid, pet in pets.items():
+        for name, info in pet.items():
+            age = info["Возраст питомца"]
+            print(f'{pid}: {info["Вид питомца"]} "{name}", {age} {get_suffix(age)}, владелец: {info["Имя владельца"]}')
+
+def create():
+    last_id = collections.deque(pets, maxlen=1)[0]
+    new_id = last_id + 1
+
+    name = input()
+    kind = input()
+    age = int(input())
+    owner = input()
+
+    pets[new_id] = {
+        name: {
+            "Вид питомца": kind,
+            "Возраст питомца": age,
+            "Имя владельца": owner
+        }
+    }
+
+def read():
+    pid = int(input())
+    pet = get_pet(pid)
+    if pet:
+        for name, info in pet.items():
+            age = info["Возраст питомца"]
+            print(f'Это {info["Вид питомца"]} по кличке "{name}". Возраст питомца: {age} {get_suffix(age)}. Имя владельца: {info["Имя владельца"]}')
+    else:
+        print("Питомец не найден")
+
+def update():
+    pid = int(input())
+    if pid in pets:
+        name = list(pets[pid].keys())[0]
+        pets[pid][name]["Вид питомца"] = input()
+        pets[pid][name]["Возраст питомца"] = int(input())
+        pets[pid][name]["Имя владельца"] = input()
+    else:
+        print("Питомец не найден")
+
+def delete():
+    pid = int(input())
+    if pid in pets:
+        del pets[pid]
+    else:
+        print("Питомец не найден")
+
+command = ""
+while command != "stop":
+    command = input()
+    if command == "create":
+        create()
+    elif command == "read":
+        read()
+    elif command == "update":
+        update()
+    elif command == "delete":
+        delete()
+    elif command == "list":
+        pets_list()
